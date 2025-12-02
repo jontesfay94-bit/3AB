@@ -1,13 +1,20 @@
-And this is my render URL :
-https://twot-ai-p.onrender.com 
-and the app should open with the same URL :
-https://twot-ai-p.onrender.com
+{
+  "name": "twot-ai-trading",
+  "version": "1.0.0",
+  "description": "SMC Trading AI Backend",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "axios": "^1.6.2"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
 
-And this is how i deployed it to render:
-your-render-app/
-├── public/
-│   └── index.html    (your HTML file goes here)
-├── index.js          (the server file above)
-└── package.json      (the package.json above)
 
-So give me the .js and the .json files too.
+
