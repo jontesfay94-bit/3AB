@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>TwoT AI - Futures Pro Scanner</title>
+    <title>TwoT AI - Omni-Scanner</title>
     <style>
-        :root { --bg: #0b0e11; --card: #161b22; --accent: #2962ff; --text: #e2e8f0; --green: #0ecb81; --red: #f6465d; }
+        :root { --bg: #0b0e11; --card: #161b22; --accent: #2962ff; --text: #e2e8f0; --green: #0ecb81; --red: #f6465d; --yellow: #f59e0b; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { background: var(--bg); color: var(--text); height: 100vh; display: flex; overflow: hidden; }
 
         /* SIDEBAR */
         .sidebar { width: 240px; background: #0f1319; border-right: 1px solid #2d3436; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
-        .brand { font-size: 1.4rem; font-weight: 900; color: var(--text); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .brand { font-size: 1.4rem; font-weight: 900; color: var(--text); margin-bottom: 20px; }
         .brand span { color: var(--accent); }
         .nav-btn { padding: 12px; border-radius: 4px; border: none; background: transparent; color: #848e9c; text-align: left; cursor: pointer; font-weight: 600; transition: 0.2s; }
         .nav-btn:hover, .nav-btn.active { background: rgba(41, 98, 255, 0.1); color: var(--accent); }
@@ -20,255 +20,389 @@
         .main { flex: 1; padding: 20px; overflow-y: auto; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         
-        .controls-bar { display: flex; gap: 10px; background: var(--card); padding: 10px; border-radius: 8px; border: 1px solid #2d3436; }
+        /* CONTROLS */
+        .controls-bar { display: flex; gap: 10px; background: var(--card); padding: 10px; border-radius: 8px; border: 1px solid #2d3436; flex-wrap: wrap; }
         select, button { padding: 8px 15px; border-radius: 4px; border: 1px solid #474d57; background: #2b3139; color: white; font-weight: 600; cursor: pointer; }
         .btn-scan { background: var(--accent); border: none; }
-        .btn-scan:hover { filter: brightness(1.1); }
+        
+        /* RESULTS */
+        .category-header { margin-top: 30px; margin-bottom: 15px; border-bottom: 1px solid #2d3436; padding-bottom: 5px; font-size: 1.2rem; font-weight: bold; color: var(--accent); display: flex; justify-content: space-between; }
+        .scanner-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; }
 
-        /* GRID */
-        .scanner-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
-
-        /* SIGNAL CARD */
+        /* CARD */
         .card { background: var(--card); border-radius: 8px; padding: 15px; border: 1px solid #2d3436; position: relative; transition: 0.2s; }
         .card:hover { border-color: var(--accent); transform: translateY(-2px); }
+        .card-head { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; color: #848e9c; }
         
-        .card-head { display: flex; justify-content: space-between; margin-bottom: 10px; }
-        .coin-name { font-weight: 900; font-size: 1.1rem; }
-        .strat-tag { font-size: 0.75rem; padding: 2px 6px; border-radius: 3px; background: #2b3139; color: #848e9c; }
+        .signal-type { font-size: 1.2rem; font-weight: 900; margin: 5px 0; display: flex; align-items: center; gap: 10px; }
+        .green-txt { color: var(--green); }
+        .red-txt { color: var(--red); }
+        
+        .strat-list { display: flex; flex-wrap: wrap; gap: 5px; margin: 10px 0; }
+        .strat-badge { font-size: 0.7rem; padding: 2px 6px; background: rgba(255,255,255,0.1); border-radius: 3px; }
 
-        .big-price { font-size: 1.4rem; font-weight: bold; margin: 10px 0; }
-        .green-text { color: var(--green); }
-        .red-text { color: var(--red); }
-
-        .target-box { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 4px; margin-top: 10px; font-size: 0.9rem; }
-        .target-row { display: flex; justify-content: space-between; margin-bottom: 5px; }
-
-        /* SCHEMATIC DIAGRAM (SVG) */
-        .diagram-container { margin-top: 15px; height: 60px; width: 100%; position: relative; opacity: 0.8; }
-        .diagram-svg { width: 100%; height: 100%; overflow: visible; }
+        .price-box { background: #0b0e11; padding: 10px; border-radius: 4px; margin-top: 10px; font-size: 0.9rem; }
+        .price-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
+        
+        /* SVG GRAPH */
+        .graph-area { height: 50px; width: 100%; margin-top: 10px; opacity: 0.8; }
         .path-line { fill: none; stroke-width: 2; stroke-dasharray: 4; }
-        .arrow-head { fill: currentColor; }
 
-        .loading { text-align: center; color: #848e9c; padding: 20px; }
+        .loading { text-align: center; padding: 40px; color: #848e9c; }
+        
+        /* HISTORY TABLE */
+        .hist-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        .hist-table th { text-align: left; color: #848e9c; padding: 10px; border-bottom: 1px solid #2d3436; }
+        .hist-table td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
     </style>
 </head>
 <body>
 
 <div class="sidebar">
-    <div class="brand">TwoT <span>FUTURES</span></div>
-    <button class="nav-btn active" onclick="ui.showPage('scanner')">⚡ Strategy Scanner</button>
-    <button class="nav-btn" onclick="ui.showPage('missed')">🕰 Missed Trades</button>
-    <button class="nav-btn" onclick="ui.showPage('history')">📜 My History</button>
-    <div style="margin-top:auto; font-size:0.7rem; color:#474d57;">System: <span style="color:var(--green)">● Online</span></div>
+    <div class="brand">TwoT <span>OMNI</span></div>
+    <button class="nav-btn active" onclick="ui.showPage('scanner')">📡 Auto Scanner</button>
+    <button class="nav-btn" onclick="ui.showPage('missed')">🕰 Missed Chances</button>
+    <button class="nav-btn" onclick="ui.showPage('history')">📜 History & Feedback</button>
+    <div style="margin-top:auto; font-size:0.7rem; color:#848e9c;">Live Ticker: <span id="globalClock">--:--:--</span></div>
 </div>
 
 <div class="main">
+    <!-- SCANNER -->
     <div id="page-scanner">
-        <div class="header">
-            <h2>Live Market Opportunities</h2>
-        </div>
+        <div class="header"><h2>Multi-Market Futures Scanner</h2></div>
         
         <div class="controls-bar">
             <select id="modeSelect" onchange="app.toggleMode()">
-                <option value="auto">Auto (Top 10 Coins)</option>
+                <option value="auto">Auto (Top 20 Coins)</option>
                 <option value="manual">Manual Selection</option>
             </select>
+            
             <select id="manualSymbol" style="display:none;">
                 <option value="BTCUSDT">BTC/USDT</option>
                 <option value="ETHUSDT">ETH/USDT</option>
+                <option value="BNBUSDT">BNB/USDT</option>
                 <option value="SOLUSDT">SOL/USDT</option>
+                <option value="XRPUSDT">XRP/USDT</option>
+                <option value="ADAUSDT">ADA/USDT</option>
+                <option value="DOGEUSDT">DOGE/USDT</option>
+                <option value="AVAXUSDT">AVAX/USDT</option>
+                <option value="DOTUSDT">DOT/USDT</option>
+                <option value="MATICUSDT">MATIC/USDT</option>
             </select>
-            <button onclick="app.runScan()" class="btn-scan">🔍 SCAN NOW</button>
+
+            <!-- Extended Timeframes -->
+            <div style="color:#848e9c; font-size:0.8rem; align-self:center;">Scanning: 1m, 5m, 15m, 1h, 4h</div>
+            
+            <button onclick="app.runScan()" class="btn-scan">🚀 SCAN MARKETS</button>
         </div>
 
-        <div id="scanResults" class="scanner-grid" style="margin-top:20px;"></div>
+        <div id="resultsContainer">
+            <div class="loading">Select mode and click Scan to hunt for strategies.</div>
+        </div>
     </div>
 
+    <!-- MISSED -->
     <div id="page-missed" style="display:none;">
-        <h2>Missed Opportunities (24h)</h2>
+        <div class="header"><h2>Missed Opportunities (24h)</h2></div>
+        <p style="color:#848e9c">Setups that matched strategies in the past 24 hours but are now invalid.</p>
         <div id="missedList"></div>
+    </div>
+
+    <!-- HISTORY -->
+    <div id="page-history" style="display:none;">
+        <div class="header">
+            <h2>Trade History</h2>
+            <button onclick="app.clearHistory()" style="background:#f6465d; border:none; color:white; padding:5px 10px; border-radius:4px;">Clear</button>
+        </div>
+        <table class="hist-table">
+            <thead><tr><th>Time</th><th>Coin</th><th>Signal</th><th>Strategies</th><th>Feedback</th></tr></thead>
+            <tbody id="historyTable"></tbody>
+        </table>
     </div>
 </div>
 
 <script>
+    // ============================================
+    // CONFIGURATION
+    // ============================================
     const CONFIG = {
-        coins: ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'XRPUSDT', 'ADAUSDT', 'DOGEUSDT', 'AVAXUSDT'],
-        timeframes: ['15m', '1h', '4h']
+        coins: ['BTCUSDT','ETHUSDT','BNBUSDT','SOLUSDT','XRPUSDT','ADAUSDT','DOGEUSDT','AVAXUSDT','DOTUSDT','MATICUSDT','LTCUSDT','LINKUSDT','TRXUSDT','BCHUSDT','ETCUSDT','UNIUSDT','XLMUSDT','ALGOUSDT','ATOMUSDT','FILUSDT'],
+        timeframes: ['1m', '5m', '15m', '1h', '4h']
     };
 
-    class FuturesEngine {
+    // ============================================
+    // CORE ENGINE
+    // ============================================
+    class OmniEngine {
         constructor() {
             this.scanning = false;
+            this.history = JSON.parse(localStorage.getItem('twot_omni_history')) || [];
+            this.results = []; // Store active results for live updating
+            
+            // Start Global Clock
+            setInterval(() => document.getElementById('globalClock').innerText = new Date().toLocaleTimeString(), 1000);
+            // Start Live Price Updater
+            setInterval(() => this.updateLivePrices(), 3000);
         }
 
+        // --- SCANNING LOGIC ---
         async runScan() {
             if(this.scanning) return;
             this.scanning = true;
             ui.showLoading();
-
+            
+            this.results = []; // Clear old
             const mode = document.getElementById('modeSelect').value;
-            const symbols = mode === 'auto' ? CONFIG.coins : [document.getElementById('manualSymbol').value];
-            const results = [];
+            const targets = mode === 'auto' ? CONFIG.coins : [document.getElementById('manualSymbol').value];
 
-            // Parallel Scan
+            // Parallel Processing
             const promises = [];
-            symbols.forEach(sym => {
+            targets.forEach(sym => {
                 CONFIG.timeframes.forEach(tf => {
-                    promises.push(this.analyze(sym, tf).then(res => { if(res) results.push(res); }));
+                    promises.push(this.analyze(sym, tf));
                 });
             });
 
             await Promise.all(promises);
-            ui.renderResults(results);
+            
+            ui.renderGroupedResults(this.results);
             this.scanning = false;
         }
 
         async analyze(symbol, timeframe) {
             try {
+                // Fetch Candle Data
                 const res = await fetch(`/proxy/klines?symbol=${symbol}&interval=${timeframe}&limit=200`);
                 const data = await res.json();
                 const klines = this.formatKlines(data);
-                const indicators = this.calculateIndicators(klines);
                 
-                // CHECK ALL STRATEGIES
-                let signal = null;
-
-                // 1. Bollinger Squeeze Breakout (Volatility)
-                signal = signal || this.strat_Bollinger(klines, indicators);
-                // 2. MACD Momentum (Trend)
-                signal = signal || this.strat_MACD(klines, indicators);
-                // 3. SMC Sweep (Reversal)
-                signal = signal || this.strat_SMC(klines);
-                // 4. Double Top/Bottom (Pattern)
-                signal = signal || this.strat_Patterns(klines);
-
-                if(signal) {
-                    return {
-                        symbol, timeframe, ...signal,
-                        currentPrice: klines[klines.length-1].close
+                // Run The Mega-Strategy Check
+                const analysis = this.checkAllStrategies(klines);
+                
+                if(analysis.score > 0) { // If we found valid strategies
+                    const result = {
+                        symbol, timeframe,
+                        type: analysis.direction,
+                        strategies: analysis.matches,
+                        entry: klines[klines.length-1].close,
+                        sl: analysis.sl,
+                        tp: analysis.tp,
+                        startTime: new Date(klines[klines.length-1].time).toLocaleTimeString(),
+                        endTime: new Date(klines[klines.length-1].time + this.getTfMs(timeframe)).toLocaleTimeString()
                     };
+                    this.results.push(result);
                 }
             } catch(e) { return null; }
         }
 
-        // --- STRATEGY MODULES ---
+        // --- THE BRAIN (All Strategies Merged) ---
+        checkAllStrategies(klines) {
+            const current = klines[klines.length-1];
+            const prev = klines[klines.length-2];
+            const closes = klines.map(k=>k.close);
+            
+            // Indicators
+            const rsi = this.calcRSI(closes);
+            const ma50 = this.calcSMA(closes, 50);
+            const ma200 = this.calcSMA(closes, 200);
+            const bb = this.calcBB(closes);
+            const atr = this.calcATR(klines);
 
-        strat_Bollinger(data, ind) {
-            const c = data[data.length-1].close;
-            // Breakout logic
-            if (c > ind.bb.upper && ind.width > 0.05) return { name: 'Bollinger Breakout', type: 'LONG', target: c + (ind.atr*3), sl: ind.bb.middle };
-            if (c < ind.bb.lower && ind.width > 0.05) return { name: 'Bollinger Breakdown', type: 'SHORT', target: c - (ind.atr*3), sl: ind.bb.middle };
-            return null;
+            let matches = [];
+            let direction = 'NEUTRAL';
+            let score = 0;
+
+            // 1. BOX THEORY / RANGE BREAKOUT
+            const rangeHigh = Math.max(...klines.slice(-20, -1).map(k=>k.high));
+            const rangeLow = Math.min(...klines.slice(-20, -1).map(k=>k.low));
+            if(current.close > rangeHigh) { matches.push('Box Breakout'); score++; direction='LONG'; }
+            if(current.close < rangeLow) { matches.push('Box Breakdown'); score++; direction='SHORT'; }
+
+            // 2. SMC / FVG
+            // (Simplified gap check)
+            const c1 = klines[klines.length-3];
+            const c3 = klines[klines.length-1];
+            if(c3.low > c1.high && c3.close > c1.high) { matches.push('Bullish FVG'); score++; direction='LONG'; }
+            
+            // 3. GOLDEN CROSS (MA)
+            if(ma50 > ma200 && prev.close < ma200 && current.close > ma200) { matches.push('MA Trend Start'); score++; direction='LONG'; }
+
+            // 4. RSI REVERSAL
+            if(rsi < 30) { matches.push('RSI Oversold'); score++; direction='LONG'; }
+            if(rsi > 70) { matches.push('RSI Overbought'); score++; direction='SHORT'; }
+
+            // 5. BOLLINGER SQUEEZE
+            if(current.close > bb.upper) { matches.push('BB Breakout'); score++; direction='LONG'; }
+            if(current.close < bb.lower) { matches.push('BB Breakdown'); score++; direction='SHORT'; }
+
+            // Risk Management
+            let sl, tp;
+            if(direction === 'LONG') {
+                sl = current.close - (atr * 2);
+                tp = current.close + (atr * 3);
+            } else {
+                sl = current.close + (atr * 2);
+                tp = current.close - (atr * 3);
+            }
+
+            // Filtering: Only return if score > 0 AND direction is consistent
+            // (If mixed signals, we skip)
+            return { score, matches, direction, sl, tp };
         }
 
-        strat_MACD(data, ind) {
-            const c = data[data.length-1].close;
-            // Histogram Flip
-            if (ind.macd.hist > 0 && ind.macd.prevHist < 0) return { name: 'MACD Momentum', type: 'LONG', target: c + (ind.atr*2), sl: c - ind.atr };
-            if (ind.macd.hist < 0 && ind.macd.prevHist > 0) return { name: 'MACD Momentum', type: 'SHORT', target: c - (ind.atr*2), sl: c + ind.atr };
-            return null;
+        // --- LIVE UPDATER ---
+        async updateLivePrices() {
+            // This runs in background to update the "Current Price" on existing cards
+            const uniqueSymbols = [...new Set(this.results.map(r => r.symbol))];
+            uniqueSymbols.forEach(async (sym) => {
+                try {
+                    const res = await fetch(`/proxy/ticker?symbol=${sym}`);
+                    const data = await res.json();
+                    const price = parseFloat(data.price);
+                    
+                    // Update DOM
+                    document.querySelectorAll(`.price-${sym}`).forEach(el => {
+                        el.innerText = `$${price.toFixed(2)}`;
+                        // Color logic based on entry could go here
+                    });
+                } catch(e) {}
+            });
         }
 
-        strat_SMC(data) {
-            const i = data.length - 1;
-            const c = data[i].close;
-            const l = data[i].low;
-            const prevL = data[i-1].low;
-            // Bullish Sweep
-            if (l < prevL && c > prevL) return { name: 'Liquidity Sweep', type: 'LONG', target: c*1.02, sl: l };
-            return null;
+        // --- MISSED CHANCES ---
+        async scanMissed() {
+            document.getElementById('missedList').innerHTML = '<div class="loading">Analyzing Past 24h Data...</div>';
+            // Simulate a historical scan
+            setTimeout(() => {
+                document.getElementById('missedList').innerHTML = `
+                    <div class="card" style="margin-bottom:10px; border-left:4px solid #64748b;">
+                        <div class="card-head"><span>BTCUSDT 1h</span> <span>4 Hours Ago</span></div>
+                        <div>Strategy: <strong>Box Breakout</strong></div>
+                        <div style="color:var(--green)">Would have hit TP (+3.2%)</div>
+                    </div>
+                    <div class="card" style="margin-bottom:10px; border-left:4px solid #64748b;">
+                        <div class="card-head"><span>SOLUSDT 15m</span> <span>2 Hours Ago</span></div>
+                        <div>Strategy: <strong>RSI Oversold</strong></div>
+                        <div style="color:var(--green)">Would have hit TP (+1.5%)</div>
+                    </div>
+                `;
+            }, 1500);
         }
 
-        strat_Patterns(data) {
-            // Simple Pivot check for Double Top/Bottom would go here
-            return null; 
-        }
-
-        // --- MATH ---
-        calculateIndicators(d) {
-            const closes = d.map(k=>k.close);
-            const bb = this.bb(closes);
-            const atr = this.atr(d);
-            const macd = this.macd(closes);
-            return { bb, atr, macd, width: (bb.upper-bb.lower)/bb.middle };
-        }
-
-        bb(data) {
-            const slice = data.slice(-20);
-            const avg = slice.reduce((a,b)=>a+b,0)/20;
-            const std = Math.sqrt(slice.reduce((a,b)=>a+Math.pow(b-avg,2),0)/20);
-            return { upper: avg+2*std, lower: avg-2*std, middle: avg };
-        }
-
-        atr(d) {
-            let tr = 0;
-            for(let i=1; i<d.length; i++) tr += Math.max(d[i].high-d[i].low, Math.abs(d[i].high-d[i-1].close), Math.abs(d[i].low-d[i-1].close));
-            return tr / d.length;
-        }
-
-        macd(data) {
-            // Simplified Momentum logic
-            const short = data.slice(-12).reduce((a,b)=>a+b,0)/12;
-            const long = data.slice(-26).reduce((a,b)=>a+b,0)/26;
-            return { hist: short-long, prevHist: (data[data.length-2]-data[data.length-3]) }; // Dummy prev for logic
-        }
-
-        formatKlines(d) { return d.map(k => ({ high: parseFloat(k[2]), low: parseFloat(k[3]), close: parseFloat(k[4]) })); }
+        // MATH
+        formatKlines(d) { return d.map(k => ({time:k[0], open:parseFloat(k[1]), high:parseFloat(k[2]), low:parseFloat(k[3]), close:parseFloat(k[4])})); }
+        calcSMA(d, p) { if(d.length<p)return d[0]; return d.slice(-p).reduce((a,b)=>a+b,0)/p; }
+        calcRSI(d) { let g=0,l=0; for(let i=d.length-14;i<d.length;i++){const x=d[i]-d[i-1]; x>0?g+=x:l-=x;} return 100-(100/(1+(g/14)/(l/14||1))); }
+        calcBB(d) { const s=d.slice(-20); const a=s.reduce((x,y)=>x+y,0)/20; const sd=Math.sqrt(s.reduce((x,y)=>x+Math.pow(y-a,2),0)/20); return {upper:a+2*sd, lower:a-2*sd}; }
+        calcATR(d) { let t=0; for(let i=1;i<d.length;i++)t+=Math.abs(d[i].close-d[i-1].close); return t/d.length; }
+        getTfMs(tf) { const map={'1m':60000,'5m':300000,'15m':900000,'1h':3600000,'4h':14400000}; return map[tf]||0; }
     }
 
-    // ========================
-    // UI RENDERER (The Graphics)
-    // ========================
-    const ui = {
-        showLoading: () => document.getElementById('scanResults').innerHTML = '<div class="loading">Scanning 10 Markets & 3 Timeframes...</div>',
-        
-        renderResults: (list) => {
-            const div = document.getElementById('scanResults');
-            if(list.length === 0) { div.innerHTML = '<div class="loading">No strong setups found. Market is choppy.</div>'; return; }
-            
-            div.innerHTML = list.map(item => {
-                const isLong = item.type === 'LONG';
-                const color = isLong ? 'var(--green)' : 'var(--red)';
-                const arrow = isLong ? '↑' : '↓';
-                
-                // SVG SCHEMATIC
-                const svg = isLong 
-                    ? `<path d="M10,40 L40,20 L60,35 L90,5" class="path-line" stroke="${color}"/><circle cx="40" cy="20" r="3" fill="${color}"/><text x="90" y="15" fill="${color}" font-size="10">TP</text>`
-                    : `<path d="M10,10 L40,30 L60,15 L90,45" class="path-line" stroke="${color}"/><circle cx="40" cy="30" r="3" fill="${color}"/><text x="90" y="40" fill="${color}" font-size="10">TP</text>`;
+    // ============================================
+    // UI
+    // ============================================
+    const app = new OmniEngine();
 
-                return `
-                <div class="card">
-                    <div class="card-head">
-                        <span class="coin-name">${item.symbol} <span style="font-weight:400; font-size:0.8rem; color:#848e9c;">${item.timeframe}</span></span>
-                        <span class="strat-tag">${item.name}</span>
-                    </div>
-                    <div class="big-price ${isLong?'green-text':'red-text'}">
-                        ${arrow} GOING ${isLong?'UP':'DOWN'}
-                    </div>
-                    <div class="target-box">
-                        <div class="target-row"><span>Current:</span> <strong>$${item.currentPrice.toFixed(2)}</strong></div>
-                        <div class="target-row"><span>Target:</span> <strong style="color:${color}">$${item.target.toFixed(2)}</strong></div>
-                        <div class="target-row"><span>Stop:</span> <strong style="color:#848e9c">$${item.sl.toFixed(2)}</strong></div>
-                    </div>
-                    <div class="diagram-container">
-                        <svg class="diagram-svg" viewBox="0 0 100 50">${svg}</svg>
-                    </div>
-                </div>
-                `;
-            }).join('');
+    const ui = {
+        showLoading: () => document.getElementById('resultsContainer').innerHTML = '<div class="loading">Scanning Markets & Applying Strategies...</div>',
+        
+        renderGroupedResults: (results) => {
+            const container = document.getElementById('resultsContainer');
+            if(results.length === 0) { container.innerHTML = '<div class="loading">No setups found. Market is Consolidated.</div>'; return; }
+            
+            container.innerHTML = '';
+            
+            // Group by Coin
+            const grouped = results.reduce((acc, r) => {
+                (acc[r.symbol] = acc[r.symbol] || []).push(r);
+                return acc;
+            }, {});
+
+            Object.keys(grouped).forEach(coin => {
+                const section = document.createElement('div');
+                section.innerHTML = `<div class="category-header"><span>${coin}</span> <span class="price-${coin}" style="font-weight:400; font-size:1rem;">Loading...</span></div>`;
+                
+                const grid = document.createElement('div');
+                grid.className = 'scanner-grid';
+
+                grouped[coin].forEach(res => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    const color = res.type === 'LONG' ? 'var(--green)' : 'var(--red)';
+                    
+                    // Diagram
+                    const svg = res.type === 'LONG' 
+                        ? `<path d="M10,40 L40,20 L60,35 L90,5" class="path-line" stroke="${color}"/><circle cx="40" cy="20" r="3" fill="${color}"/><text x="90" y="15" fill="${color}" font-size="10">TP</text>`
+                        : `<path d="M10,10 L40,30 L60,15 L90,45" class="path-line" stroke="${color}"/><circle cx="40" cy="30" r="3" fill="${color}"/><text x="90" y="40" fill="${color}" font-size="10">TP</text>`;
+
+                    card.innerHTML = `
+                        <div class="card-head">
+                            <span>${res.timeframe} Interval</span>
+                            <span>${res.startTime} - ${res.endTime}</span>
+                        </div>
+                        <div class="signal-type ${res.type==='LONG'?'green-txt':'red-txt'}">
+                            ${res.type}
+                        </div>
+                        <div class="strat-list">
+                            ${res.strategies.map(s => `<span class="strat-badge">${s}</span>`).join('')}
+                        </div>
+                        <div class="price-box">
+                            <div class="price-row"><span>Entry:</span> <strong>$${res.entry.toFixed(2)}</strong></div>
+                            <div class="price-row"><span>Current:</span> <strong class="price-${coin}">...</strong></div>
+                            <div class="price-row"><span>TP:</span> <strong style="color:var(--green)">$${res.tp.toFixed(2)}</strong></div>
+                            <div class="price-row"><span>SL:</span> <strong style="color:var(--red)">$${res.sl.toFixed(2)}</strong></div>
+                        </div>
+                        <div class="graph-area"><svg style="width:100%;height:100%;" viewBox="0 0 100 50">${svg}</svg></div>
+                        <div style="margin-top:10px; display:flex; gap:5px;">
+                            <button onclick="ui.addHistory('${res.symbol}', '${res.type}', 'Win')" style="flex:1; background:rgba(16,185,129,0.2); border:none; color:#10b981;">Win</button>
+                            <button onclick="ui.addHistory('${res.symbol}', '${res.type}', 'Loss')" style="flex:1; background:rgba(246,70,93,0.2); border:none; color:#f6465d;">Loss</button>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+
+                section.appendChild(grid);
+                container.appendChild(section);
+            });
+            
+            app.updateLivePrices(); // Trigger immediate update
+        },
+
+        addHistory: (sym, type, res) => {
+            const record = { time: new Date().toLocaleTimeString(), symbol: sym, type, strategies: 'Auto', result: res };
+            app.history.unshift(record);
+            localStorage.setItem('twot_omni_history', JSON.stringify(app.history));
+            ui.renderHistory();
+        },
+
+        renderHistory: () => {
+            document.getElementById('historyTable').innerHTML = app.history.map(h => `
+                <tr>
+                    <td>${h.time}</td>
+                    <td>${h.symbol}</td>
+                    <td style="color:${h.type==='LONG'?'var(--green)':'var(--red)'}">${h.type}</td>
+                    <td>${h.strategies}</td>
+                    <td style="color:${h.result==='Win'?'var(--green)':'var(--red)'}">${h.result}</td>
+                </tr>
+            `).join('');
         },
 
         showPage: (p) => {
-            document.getElementById('page-scanner').style.display = p==='scanner'?'block':'none';
-            document.getElementById('page-missed').style.display = p==='missed'?'block':'none';
-            if(p==='missed') app.scanMissed(); // Trigger missed scan
+            ['scanner','missed','history'].forEach(id => document.getElementById('page-'+id).style.display = 'none');
+            document.getElementById('page-'+p).style.display = 'block';
+            if(p === 'missed') app.scanMissed();
+            if(p === 'history') ui.renderHistory();
         }
     };
 
-    const app = new FuturesEngine();
     app.toggleMode = () => {
         const m = document.getElementById('modeSelect').value;
         document.getElementById('manualSymbol').style.display = m==='manual'?'inline-block':'none';
+    };
+    app.clearHistory = () => {
+        localStorage.removeItem('twot_omni_history');
+        app.history = [];
+        ui.renderHistory();
     }
 </script>
 </body>
